@@ -31,13 +31,13 @@ $(SOURCE_DIR): $(TARBALL) | $(CACHE_DIR)
 $(SOURCE_DIR)/Makefile: | $(SOURCE_DIR)
 	cd $(SOURCE_DIR) && cmake -DCMAKE_BUILD_TYPE=release .
 
-$(SOURCE_DIR)/src/task: $(SOURCE_DIR)/Makefile
+$(SOURCE_DIR)/src/$(NAME): $(SOURCE_DIR)/Makefile
 	$(MAKE) -C $(SOURCE_DIR)
 
-$(BUILD_DIR)/usr/local/bin/task: | $(SOURCE_DIR)/src/task
+$(BUILD_DIR)/usr/local/bin/$(NAME): | $(SOURCE_DIR)/src/$(NAME)
 	$(MAKE) -C $(SOURCE_DIR) install DESTDIR=$(BUILD_DIR)
 
-$(PACKAGE_DIR): $(BUILD_DIR)/usr/local/bin/task
+$(PACKAGE_DIR): $(BUILD_DIR)/usr/local/bin/$(NAME)
 	$(eval roots = $(shell cd $(BUILD_DIR) && find $(RELATIVE_PREFIX) -mindepth 1 -maxdepth 1))
 	mkdir -p $@
 	cd $@ && fpm -s dir -t $(PACKAGE_TYPE) -C $(BUILD_DIR) --force \
@@ -45,9 +45,17 @@ $(PACKAGE_DIR): $(BUILD_DIR)/usr/local/bin/task
 		--license "$(LICENSE)" --url $(PACKAGE_URL) --description "$(PACKAGE_DESCRIPTION)" \
 		$(roots) || cd .. && rm -rf $@
 
-.PHONY: clean distclean
+.PHONY: clean distclean install
 clean:
 	rm -rf $(BUILD_DIR) $(CACHE_DIR)
 
 distclean: clean
 	rm -rf $(PACKAGE_DIR)
+
+install: ~/pkgs
+ifeq ($(PACKAGE_TYPE),deb)
+	sudo dpkg -i $(PACKAGE_DIR)/$(NAME)*.$(PACKAGE_TYPE)
+else
+	sudo rpm -ivh $(PACKAGE_DIR)/$(NAME)*.$(PACKAGE_TYPE)
+endif
+	cp -a $(PACKAGE_DIR)/*.$(PACKAGE_TYPE) ~/pkgs/
