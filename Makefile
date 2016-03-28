@@ -1,5 +1,5 @@
 NAME = task
-VERSION = 2.5.1
+VERSION = latest
 SOURCE_URL = http://taskwarrior.org/download/$(NAME)-$(VERSION).tar.gz
 PACKAGE_URL = http://taskwarrior.org/
 PACKAGE_DESCRIPTION = Taskwarrior manages your TODO list from your command line.
@@ -27,6 +27,9 @@ $(TARBALL): | $(CACHE_DIR)
 
 $(SOURCE_DIR): $(TARBALL) | $(CACHE_DIR)
 	tar xf $< -C $(CACHE_DIR)
+ifeq ($(VERSION),latest)
+	$(eval VERSION := $(patsubst $(NAME)-%/,%,$(dir $(shell tar tf $< | head -1))))
+endif
 
 $(SOURCE_DIR)/Makefile: | $(SOURCE_DIR)
 	cd $(SOURCE_DIR) && cmake -DCMAKE_BUILD_TYPE=release .
