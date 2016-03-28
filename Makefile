@@ -1,5 +1,5 @@
 NAME = task
-VERSION = 2.5.0
+VERSION = 2.5.1
 SOURCE_URL = http://taskwarrior.org/download/$(NAME)-$(VERSION).tar.gz
 PACKAGE_URL = http://taskwarrior.org/
 PACKAGE_DESCRIPTION = Taskwarrior manages your TODO list from your command line.
