@@ -1,6 +1,6 @@
 NAME = task
-VERSION = latest
-SOURCE_URL = http://taskwarrior.org/download/$(NAME)-$(VERSION).tar.gz
+VERSION = 2.6.0
+REPO = https://git.tasktools.org/scm/tm/$(NAME).git
 PACKAGE_URL = http://taskwarrior.org/
 PACKAGE_DESCRIPTION = Taskwarrior manages your TODO list from your command line.
 LICENSE = MIT
@@ -9,8 +9,7 @@ ITERATION = 1
 BUILD_DIR := $(CURDIR)/build
 CACHE_DIR = cache
 PACKAGE_DIR = pkg
-TARBALL = $(CACHE_DIR)/$(notdir $(SOURCE_URL))
-SOURCE_DIR = $(CACHE_DIR)/$(NAME)-$(VERSION)
+SOURCE_DIR = $(CACHE_DIR)/$(NAME)
 PACKAGE_TYPE = deb
 PREFIX = /usr/local
 
@@ -20,15 +19,8 @@ all: $(PACKAGE_DIR)
 $(BUILD_DIR) $(CACHE_DIR):
 	mkdir -p $@
 
-.PRECIOUS: $(TARBALL)
-$(TARBALL): | $(CACHE_DIR)
-	wget -N -c --progress=dot:binary $(SOURCE_URL) -P $(CACHE_DIR)
-
-$(SOURCE_DIR): $(TARBALL) | $(CACHE_DIR)
-	tar xf $< -C $(CACHE_DIR)
-ifeq ($(VERSION),latest)
-	$(eval VERSION := $(patsubst $(NAME)-%/,%,$(dir $(shell tar tf $< | head -1))))
-endif
+$(SOURCE_DIR): | $(CACHE_DIR)
+	cd $| && git clone --recursive -j2 --depth 1 $(REPO) -b $(VERSION)
 
 $(SOURCE_DIR)/Makefile: | $(SOURCE_DIR)
 	cd $(SOURCE_DIR) && cmake -DCMAKE_BUILD_TYPE=release .
