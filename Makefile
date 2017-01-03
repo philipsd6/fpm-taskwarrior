@@ -1,17 +1,17 @@
 NAME = task
-VERSION = 2.6.0
+VERSION ?= 2.6.0
 REPO = https://git.tasktools.org/scm/tm/$(NAME).git
 PACKAGE_URL = http://taskwarrior.org/
 PACKAGE_DESCRIPTION = Taskwarrior manages your TODO list from your command line.
 LICENSE = MIT
-ITERATION = 1
+ITERATION ?= 1
 
 BUILD_DIR := $(CURDIR)/build
 CACHE_DIR = cache
 PACKAGE_DIR = pkg
 SOURCE_DIR = $(CACHE_DIR)/$(NAME)
-PACKAGE_TYPE = deb
-PREFIX = /usr/local
+PACKAGE_TYPE ?= deb
+PREFIX ?= /usr/local
 
 .PHONY: all
 all: $(PACKAGE_DIR)
@@ -23,7 +23,7 @@ $(SOURCE_DIR): | $(CACHE_DIR)
 	cd $| && git clone --recursive -j2 --depth 1 $(REPO) -b $(VERSION)
 
 $(SOURCE_DIR)/Makefile: | $(SOURCE_DIR)
-	cd $(SOURCE_DIR) && cmake -DCMAKE_BUILD_TYPE=release .
+	cd $(SOURCE_DIR) && cmake -DCMAKE_BUILD_TYPE=release -DCMAKE_INSTALL_PREFIX=$(PREFIX) .
 
 $(SOURCE_DIR)/src/$(NAME): $(SOURCE_DIR)/Makefile
 	$(MAKE) -C $(SOURCE_DIR)
