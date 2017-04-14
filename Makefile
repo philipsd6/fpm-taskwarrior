@@ -1,6 +1,6 @@
 NAME = task
 VERSION ?= 2.6.0
-REPO = https://git.tasktools.org/scm/tm/$(NAME).git
+REPO = https://git.tasktools.org/TM/$(NAME).git
 PACKAGE_URL = http://taskwarrior.org/
 PACKAGE_DESCRIPTION = Taskwarrior manages your TODO list from your command line.
 LICENSE = MIT
